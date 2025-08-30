@@ -1,6 +1,8 @@
 # Import libraries
+from flask import Flask, render_template, request, url_for, redirect
 
 # Instantiate Flask functionality
+app = Flask(__name__)
 
 # Sample data
 
