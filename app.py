@@ -14,8 +14,8 @@ transactions = [
 # Read operation
 @app.route("/", methods=['GET'])
 def get_transactions():
-    return render_template("transactions.html", transactions=transactions)
-
+    balance = sum(t['amount'] for t in transactions)
+    return render_template("transactions.html", transactions=transactions, balance=balance)
 # Create operation
 @app.route("/add", methods=['GET', 'POST'])
 def add_transaction():
@@ -72,6 +72,35 @@ def delete_transaction(transaction_id):
 
     # Redirect to the transactions list page after deleting the transaction
     return redirect(url_for("get_transactions"))
+
+# ✅ Neue Suche-Route
+@app.route("/search", methods=['GET', 'POST'])
+def search_transactions():
+    if request.method == 'POST':
+        # Werte aus dem Formular lesen und zu float konvertieren
+        min_amount = float(request.form['min_amount'])
+        max_amount = float(request.form['max_amount'])
+
+        # List-Comprehension zum Filtern
+        filtered_transactions = [
+            t for t in transactions
+            if min_amount <= t['amount'] <= max_amount
+        ]
+
+        # Gefilterte Liste an die bestehende Template-Ansicht übergeben
+        return render_template("transactions.html", transactions=filtered_transactions)
+
+    # Bei GET: Suchformular anzeigen
+    return render_template("search.html")
+
+# ✅ TOTAL Balance
+@app.route("/balance")
+def total_balance():
+    balance = 0
+    for i in transactions:
+        balance += i['amount']
+
+    return f"Total Balance: {balance}"
 
 # Run the Flask app
 if __name__ == "__main__":
